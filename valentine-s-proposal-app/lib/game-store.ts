@@ -38,12 +38,12 @@ export const LEVEL_TITLES: Record<number, string> = {
 }
 
 export const REVEAL_IMAGES: Record<number, string> = {
-  1: "/images/reveal-1.jpg",
+  1: "/images/reveal-1.JPG",
   2: "/images/reveal-2.jpg",
-  3: "/images/reveal-3.jpg",
+  3: "/images/reveal-3.JPG",
   4: "/images/reveal-4.jpg",
   5: "/images/reveal-5.jpg",
-  6: "/images/reveal-6.jpg",
-  7: "/images/reveal-7.jpg",
-  8: "/images/puzzle.jpg",
+  6: "/images/reveal-6.JPG",
+  7: "/images/reveal-7.JPG",
+  8: "/images/reveal-8.jpg",
 }

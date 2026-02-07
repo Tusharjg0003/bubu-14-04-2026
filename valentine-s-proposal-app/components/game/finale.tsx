@@ -191,7 +191,7 @@ export function Finale() {
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: [0, 1.3, 1] }}
-              transition={{ type: "spring", stiffness: 200 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
             >
               <svg width="80" height="80" viewBox="0 0 24 24" fill="hsl(346, 77%, 60%)" className="drop-shadow-xl">
                 <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
@@ -213,7 +213,7 @@ export function Finale() {
               transition={{ delay: 1 }}
               className="text-xl font-serif text-foreground/70 italic max-w-md"
             >
-              You just made me the happiest person alive. I love you, Riya.
+              You just made me the happiest person alive. I love you bubu.
               Happy Valentine's Day!
             </motion.p>
 

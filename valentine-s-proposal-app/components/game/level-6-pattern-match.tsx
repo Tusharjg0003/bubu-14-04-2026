@@ -69,23 +69,22 @@ export function Level6PatternMatch() {
         transition={{ delay: 0.2 }}
         className="flex gap-2 mb-2"
       >
-        {correctOrder.map((id, i) => {
-          const icon = ICONS.find((ic) => ic.id === id)
-          return (
-            <div
-              key={`hint-${id}`}
-              className={`w-10 h-10 rounded-lg flex items-center justify-center border-2 ${
-                selected.length > i
-                  ? "border-primary bg-primary/10"
-                  : "border-border bg-card"
-              }`}
-            >
-              <span className="text-xs font-sans text-muted-foreground">
-                {icon?.label}
-              </span>
-            </div>
-          )
-        })}
+        {[0, 1, 2].map((i) => (
+          <div
+            key={`slot-${i}`}
+            className={`w-10 h-10 rounded-lg flex items-center justify-center border-2 ${
+              selected.length > i
+                ? "border-primary bg-primary/10"
+                : "border-border bg-card"
+            }`}
+          >
+            {selected[i] && (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="hsl(346, 77%, 60%)">
+                <path d={ICONS.find((ic) => ic.id === selected[i])?.path} />
+              </svg>
+            )}
+          </div>
+        ))}
       </motion.div>
 
       <motion.div

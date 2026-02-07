@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useGameStore } from "@/lib/game-store"
 
@@ -13,28 +13,23 @@ interface FallingEmoji {
   isSpecial: boolean
 }
 
-const REGULAR_EMOJIS = [
-  "star", "sparkle", "cloud", "sun", "drop", "leaf", "flame", "snow",
-  "bell", "gem", "crown", "bolt", "wave", "shell", "fish", "bird",
-]
-
-const SPECIAL_LABEL = "butterfly"
-
 export function Level7EmojiRain() {
   const { completeLevel } = useGameStore()
   const [emojis, setEmojis] = useState<FallingEmoji[]>([])
   const [found, setFound] = useState(false)
   const [missed, setMissed] = useState(0)
+  const [showTryAgain, setShowTryAgain] = useState(false)
 
-  useEffect(() => {
+  const generateEmojis = useCallback(() => {
     const pool: FallingEmoji[] = []
-    const specialIndex = Math.floor(Math.random() * 50)
+    const totalEmojis = 80
+    const specialIndex = Math.floor(Math.random() * totalEmojis) + 10
 
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < totalEmojis; i++) {
       const isSpecial = i === specialIndex
       pool.push({
         id: i,
-        emoji: isSpecial ? SPECIAL_LABEL : REGULAR_EMOJIS[Math.floor(Math.random() * REGULAR_EMOJIS.length)],
+        emoji: isSpecial ? "🌹" : "❤️",
         x: Math.random() * 85 + 5,
         delay: Math.random() * 8,
         duration: Math.random() * 4 + 5,
@@ -44,39 +39,52 @@ export function Level7EmojiRain() {
     setEmojis(pool)
   }, [])
 
+  useEffect(() => {
+    generateEmojis()
+  }, [generateEmojis])
+
+  useEffect(() => {
+    if (emojis.length === 0) return
+    
+    // Calculate when all emojis will finish falling
+    const maxTime = Math.max(...emojis.map(e => (e.delay + e.duration) * 1000))
+    
+    const timer = setTimeout(() => {
+      if (!found && !showTryAgain) {
+        setShowTryAgain(true)
+      }
+    }, maxTime + 500) // Add 500ms buffer
+    
+    return () => clearTimeout(timer)
+  }, [emojis, found, showTryAgain])
+
   const handleClick = (emoji: FallingEmoji) => {
     if (emoji.isSpecial) {
       setFound(true)
       setTimeout(() => completeLevel(7), 800)
     } else {
-      setMissed((prev) => prev + 1)
+      const newMissed = missed + 1
+      setMissed(newMissed)
       setEmojis((prev) => prev.filter((e) => e.id !== emoji.id))
+      
+      if (newMissed >= 3) {
+        setShowTryAgain(true)
+      }
     }
   }
 
-  const getEmojiSvg = (label: string, isSpecial: boolean) => {
-    if (isSpecial) {
-      return (
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="hsl(346, 77%, 60%)" stroke="hsl(346, 77%, 40%)" strokeWidth="0.5">
-          <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
-        </svg>
-      )
-    }
+  const handleRestart = () => {
+    setMissed(0)
+    setShowTryAgain(false)
+    setFound(false)
+    generateEmojis()
+  }
 
-    const colors: Record<string, string> = {
-      star: "#f0a500", sparkle: "#e8768a", cloud: "#a0b0c0", sun: "#f5c542",
-      drop: "#5b9bd5", leaf: "#6db56d", flame: "#e85d3a", snow: "#b0d4f1",
-      bell: "#d4a344", gem: "#9b5de5", crown: "#d4a344", bolt: "#f5c542",
-      wave: "#5b9bd5", shell: "#e8a098", fish: "#5b9bd5", bird: "#8b9dc3",
-    }
-
+  const getEmoji = (emoji: string) => {
     return (
-      <svg width="28" height="28" viewBox="0 0 24 24" fill={colors[label] || "#999"}>
-        <circle cx="12" cy="12" r="10" opacity="0.8" />
-        <text x="12" y="16" textAnchor="middle" fill="white" fontSize="10" fontFamily="sans-serif">
-          {label.charAt(0).toUpperCase()}
-        </text>
-      </svg>
+      <span className="text-4xl select-none">
+        {emoji}
+      </span>
     )
   }
 
@@ -88,24 +96,24 @@ export function Level7EmojiRain() {
         className="absolute top-4 left-1/2 -translate-x-1/2 z-10 text-center"
       >
         <p className="text-lg font-sans text-foreground/60">
-          Find the special one!
+          Find the rose among the hearts!
         </p>
         <p className="text-sm font-sans text-muted-foreground mt-1">
-          Look for the pink checkmark among the falling icons
+          Look carefully for the special rose 🌹
         </p>
-        {missed > 0 && (
+        {missed > 0 && missed < 3 && (
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="text-xs font-sans text-muted-foreground mt-1"
+            className="text-xs font-sans text-destructive mt-1"
           >
-            Not that one! Keep looking... ({missed} tried)
+            Not that one! Keep looking... ({missed}/3 mistakes)
           </motion.p>
         )}
       </motion.div>
 
       <AnimatePresence>
-        {!found &&
+        {!found && !showTryAgain &&
           emojis.map((emoji) => (
             <motion.button
               key={emoji.id}
@@ -127,10 +135,38 @@ export function Level7EmojiRain() {
               whileHover={{ scale: 1.4 }}
               whileTap={{ scale: 0.6 }}
             >
-              {getEmojiSvg(emoji.emoji, emoji.isSpecial)}
+              {getEmoji(emoji.emoji)}
             </motion.button>
           ))}
       </AnimatePresence>
+
+      {showTryAgain && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="absolute inset-0 flex flex-col items-center justify-center bg-background/90 z-30"
+        >
+          <motion.div
+            animate={{ rotate: [0, -5, 5, 0] }}
+            transition={{ repeat: 3, duration: 0.5 }}
+            className="text-7xl"
+          >
+            😢
+          </motion.div>
+          <p className="text-2xl font-serif text-foreground/80 mt-4 mb-2">
+            {missed >= 3 ? "Too many mistakes!" : "You missed the rose!"}
+          </p>
+          <p className="text-lg text-muted-foreground mb-6">
+            {missed >= 3 ? "Try again and find the rose! 🌹" : "Be quicker next time! 🌹"}
+          </p>
+          <button
+            onClick={handleRestart}
+            className="px-8 py-3 bg-primary text-primary-foreground rounded-full text-lg font-sans shadow-lg hover:scale-105 transition-transform"
+          >
+            Try Again
+          </button>
+        </motion.div>
+      )}
 
       {found && (
         <motion.div
@@ -142,10 +178,9 @@ export function Level7EmojiRain() {
             <motion.div
               animate={{ rotate: [0, 10, -10, 0] }}
               transition={{ repeat: Number.POSITIVE_INFINITY, duration: 2 }}
+              className="text-7xl"
             >
-              <svg width="64" height="64" viewBox="0 0 24 24" fill="hsl(346, 77%, 60%)">
-                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-              </svg>
+              🌹
             </motion.div>
             <p className="text-2xl font-serif text-primary mt-4">
               You found it!

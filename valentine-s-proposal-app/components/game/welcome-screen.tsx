@@ -80,7 +80,7 @@ export function WelcomeScreen() {
         transition={{ delay: 0.3 }}
         className="text-4xl md:text-6xl font-serif font-bold text-foreground leading-tight"
       >
-        Hey Riya,
+        Hey Cutu,
       </motion.h1>
 
       <motion.p

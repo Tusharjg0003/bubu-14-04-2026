@@ -17,9 +17,11 @@ export function Level2HeartPop() {
   const { completeLevel } = useGameStore()
   const [hearts, setHearts] = useState<FloatingHeart[]>([])
   const [popped, setPopped] = useState(0)
-  const total = 15
+  const [timeLeft, setTimeLeft] = useState(10)
+  const [gameOver, setGameOver] = useState(false)
+  const total = 13
 
-  useEffect(() => {
+  const generateHearts = useCallback(() => {
     const generated: FloatingHeart[] = Array.from({ length: total }, (_, i) => ({
       id: i,
       x: Math.random() * 80 + 10,
@@ -31,8 +33,29 @@ export function Level2HeartPop() {
     setHearts(generated)
   }, [])
 
+  useEffect(() => {
+    generateHearts()
+  }, [generateHearts])
+
+  useEffect(() => {
+    if (gameOver) return
+
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          setGameOver(true)
+          return 0
+        }
+        return prev - 1
+      })
+    }, 1000)
+
+    return () => clearInterval(timer)
+  }, [gameOver])
+
   const popHeart = useCallback(
     (id: number) => {
+      if (gameOver) return
       setHearts((prev) => prev.filter((h) => h.id !== id))
       const newPopped = popped + 1
       setPopped(newPopped)
@@ -40,8 +63,15 @@ export function Level2HeartPop() {
         setTimeout(() => completeLevel(2), 500)
       }
     },
-    [popped, completeLevel]
+    [popped, gameOver, completeLevel]
   )
+
+  const handleRestart = () => {
+    setPopped(0)
+    setTimeLeft(10)
+    setGameOver(false)
+    generateHearts()
+  }
 
   return (
     <div className="relative w-full h-full">
@@ -56,7 +86,30 @@ export function Level2HeartPop() {
         <p className="text-3xl font-serif text-primary font-bold mt-1">
           {popped} / {total}
         </p>
+        <p className={`text-2xl font-bold mt-2 ${timeLeft <= 5 ? 'text-destructive' : 'text-foreground/70'}`}>
+          ⏱️ {timeLeft}s
+        </p>
       </motion.div>
+
+      <AnimatePresence>
+        {gameOver && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            className="absolute inset-0 flex flex-col items-center justify-center bg-background/90 z-20"
+          >
+            <p className="text-3xl font-serif text-destructive mb-2">Time's Up!</p>
+            <p className="text-xl text-foreground/70 mb-6">Try Again</p>
+            <button
+              onClick={handleRestart}
+              className="px-8 py-3 bg-primary text-primary-foreground rounded-full text-lg font-sans shadow-lg hover:scale-105 transition-transform"
+            >
+              Restart
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
         {hearts.map((heart) => (

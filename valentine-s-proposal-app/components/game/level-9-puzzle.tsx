@@ -91,7 +91,7 @@ export function Level9Puzzle() {
               <div
                 className="absolute inset-0 bg-cover bg-no-repeat"
                 style={{
-                  backgroundImage: "url(/images/puzzle.jpg)",
+                  backgroundImage: "url(/images/puzzle.PNG)",
                   backgroundPosition: `${piece.col * 100}% ${piece.row * 100}%`,
                   backgroundSize: "200% 200%",
                 }}

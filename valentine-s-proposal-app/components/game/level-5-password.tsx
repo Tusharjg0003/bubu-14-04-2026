@@ -13,17 +13,13 @@ export function Level5Password() {
   const [shake, setShake] = useState(false)
   const [completed, setCompleted] = useState(false)
 
-  const correctAnswers = [
-    "baby", "babe", "jaan", "jaanu", "cutie", "love",
-    "sweetheart", "darling", "honey", "princess", "angel",
-    "shona", "babu", "riya"
-  ]
+  const correctAnswers = ["I will protect","i will protect"]
 
   const hints = [
-    "Think about what I call you when we're together...",
+    "Think about what I first told you that made you happy.",
     "It's something sweet and affectionate...",
-    "Hint: It's a common term of endearment!",
-    "Try: baby, jaan, cutie, or any pet name!",
+    "Hint: It's something I often tell you that you love to hear.",
+    "Try: I .... .......",
   ]
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -48,7 +44,7 @@ export function Level5Password() {
         className="text-center"
       >
         <p className="text-xl md:text-2xl font-serif text-foreground/70">
-          What is my favorite nickname for you?
+          3 Words - Guess the Secret Phrase
         </p>
         <AnimatePresence mode="wait">
           {attempts > 0 && (

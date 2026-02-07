@@ -59,7 +59,7 @@ export function Level1GhostButton() {
 
       <motion.button
         animate={position}
-        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+        transition={{ type: "spring", stiffness: 250, damping: 20 }}
         onHoverStart={handleHover}
         onTouchStart={handleHover}
         onClick={handleClick}
