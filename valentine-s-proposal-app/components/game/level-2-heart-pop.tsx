@@ -68,7 +68,7 @@ export function Level2HeartPop() {
 
   const handleRestart = () => {
     setPopped(0)
-    setTimeLeft(10)
+    setTimeLeft(15)
     setGameOver(false)
     generateHearts()
   }
